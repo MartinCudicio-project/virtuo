@@ -83,25 +83,6 @@ var rentals = [{
     'treasury': 0,
     'virtuo': 0
   }
-},{
-  'id': '8c1789c0-8e6a-48e3-8ee5-a6d4da682f2a',
-  'driver': {
-    'firstName': 'Fadily',
-    'lastName': 'Camara'
-  },
-  'carId': '4afcc3a2-bbf4-44e8-b739-0179a6cd8b7d',
-  'pickupDate': '2019-12-01',
-  'returnDate': '2019-12-15',
-  'distance': 1000,
-  'options': {
-    'deductibleReduction': true
-  },
-  'price': 0,
-  'commission': {
-    'insurance': 0,
-    'treasury': 0,
-    'virtuo': 0
-  }
 }];
 
 //list of actors for payment
@@ -265,7 +246,18 @@ function rentalComissionCalculator(rentals){
   });
 }
 
+function actorsDebitCredit(rentals,actors){
+  rentals.forEach(rental => {
+    const actIndex = actors.findIndex(act => act.rentalId== rental.id);
+    actors[actIndex].payment[0].amount = rental.price
+    actors[actIndex].payment[1].amount = rental.price*0.7
+    actors[actIndex].payment[2].amount = rental.commission.insurance
+    actors[actIndex].payment[3].amount = rental.commission.treasury
+    actors[actIndex].payment[4].amount = rental.commission.virtuo
+    console.log(actors[actIndex]) 
+  })
+}
+
 rentalPriceCalculator(rentals)
 rentalComissionCalculator(rentals)
-
-console.log(rentals) 
+actorsDebitCredit(rentals,actors)
