@@ -158,57 +158,6 @@ const actors = [{
   }]
 }];
 
-function rentalPriceCalculator(rentals){
-  var res = [];
-  rentals.forEach(element => {
-    
-    // To set two dates to two variables 
-    var datePick = new Date(element.pickupDate); 
-    var dateRet = new Date(element.returnDate); 
-    // To calculate the time difference of two dates 
-    var Difference_In_Time = Math.abs(datePick.getTime() - dateRet.getTime()); 
-    // To calculate the no. of days between two dates 
-    var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24) + 1;
-    console.log(Difference_In_Days) 
-    var price = getCarPrice(cars,element.carId,Difference_In_Days,element.distance)
-    console.log(price)
-    price = getDescPrice(price,Difference_In_Days)
-    console.log(price)
-
-    const result = res.filter(e => e.id == element.id);
-    if(result.length!=1){
-      const post = {id : element.id, totalPrice : price}
-      res.push(post)
-    }
-    else{
-      result[0].totalPrice += price
-    }
-  });
-  console.log(res)
-}
-
-function getCarPrice(cars,carId,ndays,km){
-  const car = cars.filter(car => car.id == carId);
-  var price = 0;
-  if(car.length == 1){
-    price = car[0].pricePerDay * ndays
-    price += car[0].pricePerKm * km
-  }
-  return price
-}
-
-function getDescPrice(price, ndays){
-  if(ndays>10){
-    return price*0.5;
-  }
-  if(ndays>4){
-    return price*0.7;
-  }
-  if(ndays>1){
-    return price*0.9
-  }
-  return price
-}
-
-rentalPriceCalculator(rentals)
-// console.log(getDescPrice(1000,1))
+console.log(cars);
+console.log(rentals);
+console.log(actors);
