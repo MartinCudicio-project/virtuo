@@ -83,6 +83,25 @@ var rentals = [{
     'treasury': 0,
     'virtuo': 0
   }
+},{
+  'id': '8c1789c0-8e6a-48e3-8ee5-a6d4da682f2a',
+  'driver': {
+    'firstName': 'Fadily',
+    'lastName': 'Camara'
+  },
+  'carId': '4afcc3a2-bbf4-44e8-b739-0179a6cd8b7d',
+  'pickupDate': '2019-12-01',
+  'returnDate': '2019-12-15',
+  'distance': 1000,
+  'options': {
+    'deductibleReduction': true
+  },
+  'price': 0,
+  'commission': {
+    'insurance': 0,
+    'treasury': 0,
+    'virtuo': 0
+  }
 }];
 
 //list of actors for payment
@@ -171,8 +190,12 @@ function rentalPriceCalculator(rentals){
     var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24) + 1;
     var price = getCarPrice(cars,element.carId,Difference_In_Days,element.distance)
     price = getDescPrice(price,Difference_In_Days)
-    element.price = price
+    if(element.options.deductibleReduction)
+      element.price = price + 4*Difference_In_Days
+    else
+      element.price = price
     const result = res.filter(e => e.id == element.id);
+    // we actualize the informartions about rentals
     if(result.length!=1){
       const post = {id : element.id, totalPrice : price}
       res.push(post)
@@ -180,7 +203,10 @@ function rentalPriceCalculator(rentals){
     else{
       result[0].totalPrice += price
     }
-  });
+
+  })
+  // we return the global price per driver
+  return res;
 }
 
 function getCarPrice(cars,carId,ndays,km){
@@ -210,7 +236,7 @@ function rentalComissionCalculator(rentals){
   var res = [];
   rentals.forEach(element => {
     const result = rentals.filter(e => e.id == element.id);
-    if(result.length==1){
+    if(result.length!=0){
       // To set two dates to two variables 
       var datePick = new Date(element.pickupDate); 
       var dateRet = new Date(element.returnDate); 
@@ -218,20 +244,28 @@ function rentalComissionCalculator(rentals){
       var Difference_In_Time = Math.abs(datePick.getTime() - dateRet.getTime()); 
       // To calculate the no. of days between two dates 
       var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24) + 1;
+      
+      // the real comm is without the additional charge of 4$/per day
+      // we actualize this additionnal charge before this method
+      // so per default, its value is 0. We have to deduce the additional charges of total price
+      
       // comm is 30% of total price
-      const comm =  element.price * 0.3;
-      // insurance is half of commision 
-      element.commission.insurance = comm *0.5;
+      const comm =  (element.price-element.commission.virtuo) * 0.3;
+      // insurance is half of commision
+      element.commission.insurance += comm *0.5;
       // 1$ dollard of treasury per day
-      element.commission.treasury = Difference_In_Days;
+      element.commission.treasury += Difference_In_Days;
       // the rest for Virtuo
-      element.commission.virtuo = comm * 0.5 - Difference_In_Days;
-
+      if(element.options.deductibleReduction)
+        element.commission.virtuo += comm * 0.5 +3*Difference_In_Days;
+      else{
+        element.commission.virtuo += comm * 0.5 - Difference_In_Days;
+      }
     }
-    console.log(result)
   });
 }
 
 rentalPriceCalculator(rentals)
 rentalComissionCalculator(rentals)
-// console.log(rentals)
+
+console.log(rentals) 
