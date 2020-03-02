@@ -26,7 +26,7 @@ const cars = [{
 //The `price` is updated from step 1 and 2
 //The `commission` is updated from step 3
 //The `options` is useful for step 4
-const rentals = [{
+var rentals = [{
   'id': '893a04a3-e447-41fe-beec-9a6bfff6fdb4',
   'driver': {
     'firstName': 'Roman',
@@ -181,7 +181,6 @@ function rentalPriceCalculator(rentals){
       result[0].totalPrice += price
     }
   });
-  console.log(res)
 }
 
 function getCarPrice(cars,carId,ndays,km){
@@ -207,4 +206,32 @@ function getDescPrice(price, ndays){
   return price
 }
 
+function rentalComissionCalculator(rentals){
+  var res = [];
+  rentals.forEach(element => {
+    const result = rentals.filter(e => e.id == element.id);
+    if(result.length==1){
+      // To set two dates to two variables 
+      var datePick = new Date(element.pickupDate); 
+      var dateRet = new Date(element.returnDate); 
+      // To calculate the time difference of two dates 
+      var Difference_In_Time = Math.abs(datePick.getTime() - dateRet.getTime()); 
+      // To calculate the no. of days between two dates 
+      var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24) + 1;
+      // comm is 30% of total price
+      const comm =  element.price * 0.3;
+      // insurance is half of commision 
+      element.commission.insurance = comm *0.5;
+      // 1$ dollard of treasury per day
+      element.commission.treasury = Difference_In_Days;
+      // the rest for Virtuo
+      element.commission.virtuo = comm * 0.5 - Difference_In_Days;
+
+    }
+    console.log(result)
+  });
+}
+
 rentalPriceCalculator(rentals)
+rentalComissionCalculator(rentals)
+// console.log(rentals)
